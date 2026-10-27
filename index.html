@@ -3,153 +3,107 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>제주 여행 안내</title>
+<title>이미지 슬라이드</title>
 <style>
   * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    font-family: sans-serif;
-    background: #eef6f5;
-    color: #26323a;
-    line-height: 1.6;
-  }
-  .layout {
-    max-width: 960px;
-    margin: 0 auto;
-    padding: 16px;
-    display: grid;
-    gap: 12px;
-    grid-template-columns: 2fr 1fr;
-    grid-template-areas:
-      "header  header"
-      "nav     nav"
-      "section aside"
-      "article aside"
-      "footer  footer";
-  }
-  header  { grid-area: header; }
-  nav     { grid-area: nav; }
-  section { grid-area: section; }
-  article { grid-area: article; }
-  aside   { grid-area: aside; }
-  footer  { grid-area: footer; }
-
-  header {
-    background: linear-gradient(135deg, #1b8fa6, #f58a3b);
-    color: #fff;
-    text-align: center;
-    padding: 32px 16px;
-    border-radius: 12px;
-  }
-  header h1 { margin: 0; font-size: 2rem; }
-  header p { margin: 6px 0 0; opacity: .95; }
-
-  nav {
-    background: #fff;
-    border-radius: 12px;
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 8px;
-    padding: 10px;
-  }
-  nav a {
-    text-decoration: none;
-    color: #26323a;
-    padding: 6px 16px;
-    border-radius: 16px;
-  }
-  nav a:hover { background: #ffe9d6; color: #d96a1a; }
-
-  section, article, aside {
-    background: #fff;
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,.06);
-  }
-  h2 { margin: 0 0 10px; font-size: 1.25rem; color: #1b8fa6; }
-  h3 { margin: 14px 0 4px; font-size: 1.05rem; }
-  p { margin: 0 0 8px; }
-
-  .spots { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-top: 12px; }
-  .spot { background: #f4fbfa; border-radius: 10px; padding: 12px; }
-  .spot b { display: block; margin-bottom: 4px; }
-
-  aside ul { margin: 0; padding-left: 20px; }
-  aside li { margin-bottom: 6px; }
-  .tip { background: #fff4e8; border-radius: 10px; padding: 10px; margin-top: 12px; font-size: .9rem; }
-
-  footer {
-    background: #26323a;
-    color: #dfe7ea;
-    text-align: center;
-    padding: 16px;
-    border-radius: 12px;
-    font-size: .9rem;
-  }
-
-  @media (max-width: 700px) {
-    .layout {
-      grid-template-columns: 1fr;
-      grid-template-areas: "header" "nav" "section" "article" "aside" "footer";
-    }
-  }
+  body { margin: 0; font-family: sans-serif; background: #f2f5f8; color: #223; }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 20px 16px 40px; }
+  h1 { margin: 0 0 12px; font-size: 1.5rem; }
+  .form { display: flex; gap: 8px; margin-bottom: 12px; }
+  #q { flex: 1; padding: 8px 10px; font-size: 1rem; border: 1px solid #bbb; border-radius: 6px; }
+  button { padding: 8px 16px; font-size: 1rem; border: 0; border-radius: 6px; background: #2b7de9; color: #fff; cursor: pointer; }
+  button:disabled { background: #aab; cursor: default; }
+  #msg { min-height: 1.5em; color: #c0392b; margin-bottom: 8px; }
+  .viewport { overflow: hidden; border-radius: 10px; }
+  .page { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+  .page img { width: 100%; height: 150px; object-fit: cover; border-radius: 8px; display: block; background: #dde; }
+  .slide-next { animation: inRight .35s ease; }
+  .slide-prev { animation: inLeft .35s ease; }
+  @keyframes inRight { from { transform: translateX(60px); opacity: 0; } to { transform: none; opacity: 1; } }
+  @keyframes inLeft  { from { transform: translateX(-60px); opacity: 0; } to { transform: none; opacity: 1; } }
+  .nav { display: flex; justify-content: center; align-items: center; gap: 16px; margin-top: 14px; }
+  #info { min-width: 180px; text-align: center; }
+  .credit { margin-top: 24px; font-size: .85rem; color: #667; text-align: center; }
+  .credit a { color: #2b7de9; }
+  @media (max-width: 700px) { .page { grid-template-columns: repeat(2, 1fr); } }
 </style>
 </head>
 <body>
-<div class="layout">
+<div class="wrap">
+  <h1>🖼️ 이미지 슬라이드</h1>
 
-  <header>
-    <h1>🌴 제주 여행 안내 🍊</h1>
-    <p>바다, 오름, 그리고 쉼이 있는 섬으로 떠나요</p>
-  </header>
+  <div class="form">
+    <input id="q" type="text" placeholder="검색어를 입력하세요 (예: 제주 바다)">
+    <button id="search">검색</button>
+  </div>
+  <div id="msg"></div>
 
-  <nav>
-    <a href="#highlights">🌟 대표 명소</a>
-    <a href="#course">🗺️ 추천 코스</a>
-    <a href="#tips">💡 여행 팁</a>
-    <a href="#contact">📞 안내</a>
-  </nav>
+  <div class="viewport"><div class="page" id="page"></div></div>
 
-  <section id="highlights">
-    <h2>🌟 제주 대표 명소</h2>
-    <p>제주는 화산섬이 만든 독특한 풍경과 푸른 바다를 함께 즐길 수 있는 곳이에요.</p>
-    <div class="spots">
-      <div class="spot"><b>🌅 성산일출봉</b>바다 위로 솟은 분화구, 일출 명소로 유명해요.</div>
-      <div class="spot"><b>⛰️ 한라산</b>남한 최고봉, 계절마다 다른 모습의 등산 코스가 있어요.</div>
-      <div class="spot"><b>🏖️ 협재해변</b>에메랄드빛 바다와 하얀 모래가 매력적이에요.</div>
-      <div class="spot"><b>🏝️ 우도</b>배를 타고 들어가는 작은 섬, 자전거 여행에 좋아요.</div>
-      <div class="spot"><b>💧 천지연폭포</b>도심 가까이에서 만나는 시원한 폭포예요.</div>
-      <div class="spot"><b>🕳️ 만장굴</b>세계적으로 알려진 용암동굴이에요.</div>
-    </div>
-  </section>
+  <div class="nav">
+    <button id="prev" disabled>◀ 이전 10개</button>
+    <span id="info">검색어를 입력해 주세요</span>
+    <button id="next" disabled>다음 10개 ▶</button>
+  </div>
 
-  <article id="course">
-    <h2>🗺️ 1박 2일 추천 코스</h2>
-    <h3>☀️ 1일차 · 동쪽 코스</h3>
-    <p>성산일출봉 → 섭지코지 → 우도 → 해안도로 드라이브</p>
-    <h3>🌙 2일차 · 서쪽 코스</h3>
-    <p>협재해변 → 한림 카페거리 → 오름 산책 → 노을 감상</p>
-    <p>☕ 코스 중간중간 분위기 좋은 카페에서 쉬어가는 것도 잊지 마세요!</p>
-  </article>
-
-  <aside id="tips">
-    <h2>💡 여행 팁</h2>
-    <ul>
-      <li>🚗 대중교통보다 렌터카가 편해요</li>
-      <li>🌦️ 날씨 변화가 잦으니 겉옷을 챙겨요</li>
-      <li>🍽️ 흑돼지, 해산물, 감귤 디저트를 꼭 맛보세요</li>
-      <li>📅 성수기엔 숙소와 항공권을 미리 예약해요</li>
-      <li>🌱 오름과 해변에서는 쓰레기를 되가져가요</li>
-    </ul>
-    <div class="tip">📌 영업시간과 입장료는 방문 전에 공식 안내로 확인해 주세요.</div>
-  </aside>
-
-  <footer id="contact">
-    <p>🍊 제주 여행 안내 · 즐거운 제주 여행 되세요 🌊</p>
-    <p>정확한 관광 정보는 제주관광 공식 안내를 참고해 주세요.</p>
-  </footer>
-
+  <p class="credit">이미지 출처: <a href="https://pixabay.com" target="_blank" rel="noopener">Pixabay</a></p>
 </div>
+
+<script>
+  const PER_PAGE = 10;
+  const MAX_HITS = 500; // Pixabay API 한도
+  const $ = id => document.getElementById(id);
+  let state = { q: '', page: 1, total: 0 };
+
+  async function load(page, direction) {
+    const q = $('q').value.trim();
+    if (!q) { $('msg').textContent = '검색어를 입력해 주세요.'; return; }
+    $('msg').textContent = '';
+    ['prev', 'next', 'search'].forEach(i => $(i).disabled = true);
+    try {
+      // API Key는 서버(/api/pixabay)가 환경변수로 가지고 있어서 브라우저에는 없다.
+      const res = await fetch('/api/pixabay?' + new URLSearchParams({ q, page }));
+      if (!res.ok) throw new Error(res.status === 429 ? '요청이 너무 많아요. 잠시 후 다시 시도해 주세요.'
+        : '오류가 발생했어요 (' + res.status + ')');
+      const data = await res.json();
+      state = { q, page, total: Math.min(data.totalHits, MAX_HITS) };
+      render(data.hits, direction);
+    } catch (e) {
+      $('msg').textContent = e.message;
+    } finally {
+      $('search').disabled = false;
+      updateNav();
+    }
+  }
+
+  function render(hits, direction) {
+    const el = $('page');
+    el.className = 'page';
+    el.innerHTML = '';
+    if (!hits.length) { $('msg').textContent = '검색 결과가 없어요.'; return; }
+    hits.forEach(h => {
+      const a = document.createElement('a');
+      a.href = h.pageURL; a.target = '_blank'; a.rel = 'noopener';
+      const img = document.createElement('img');
+      img.src = h.webformatURL; img.alt = h.tags; img.title = h.tags; img.loading = 'lazy';
+      a.appendChild(img);
+      el.appendChild(a);
+    });
+    void el.offsetWidth; // 애니메이션 재시작
+    el.classList.add(direction === 'prev' ? 'slide-prev' : 'slide-next');
+  }
+
+  function updateNav() {
+    const lastPage = Math.max(1, Math.ceil(state.total / PER_PAGE));
+    $('prev').disabled = state.page <= 1;
+    $('next').disabled = state.page >= lastPage || !state.total;
+    if (state.total) $('info').textContent = state.page + ' / ' + lastPage + ' 페이지 (총 ' + state.total + '장)';
+  }
+
+  $('search').onclick = () => load(1, 'next');
+  $('q').addEventListener('keydown', e => { if (e.key === 'Enter') load(1, 'next'); });
+  $('prev').onclick = () => load(state.page - 1, 'prev');
+  $('next').onclick = () => load(state.page + 1, 'next');
+</script>
 </body>
 </html>
