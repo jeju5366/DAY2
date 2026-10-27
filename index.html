@@ -86,15 +86,11 @@
   .gallery button { padding: 8px 16px; font-size: 1rem; border: 0; border-radius: 6px; background: #1b8fa6; color: #fff; cursor: pointer; }
   .gallery button:disabled { background: #aab; cursor: default; }
   #msg { min-height: 1.5em; color: #c0392b; margin-bottom: 6px; }
-  .viewport { overflow: hidden; border-radius: 10px; }
-  .photos { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
-  .photos img { width: 100%; height: 150px; object-fit: cover; border-radius: 8px; display: block; background: #dde; }
-  .slide-next { animation: inRight .35s ease; }
-  .slide-prev { animation: inLeft .35s ease; }
-  @keyframes inRight { from { transform: translateX(60px); opacity: 0; } to { transform: none; opacity: 1; } }
-  @keyframes inLeft  { from { transform: translateX(-60px); opacity: 0; } to { transform: none; opacity: 1; } }
-  .pager { display: flex; justify-content: center; align-items: center; gap: 16px; margin-top: 12px; }
-  #info { min-width: 180px; text-align: center; }
+  .stage { position: relative; height: 380px; background: #26323a; border-radius: 10px; overflow: hidden; display: none; }
+  .stage.on { display: block; }
+  .stage img { width: 100%; height: 100%; object-fit: contain; display: block; animation: fadeIn .4s ease; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  #info { margin-top: 8px; text-align: center; font-size: .9rem; color: #556; min-height: 1.4em; }
   .credit { margin: 12px 0 0; font-size: .85rem; color: #667; text-align: center; }
   .credit a { color: #1b8fa6; }
 
@@ -112,7 +108,7 @@
       grid-template-columns: 1fr;
       grid-template-areas: "header" "nav" "section" "article" "aside" "gallery" "footer";
     }
-    .photos { grid-template-columns: repeat(2, 1fr); }
+    .stage { height: 260px; }
   }
 </style>
 </head>
@@ -173,12 +169,8 @@
       <button id="search">검색</button>
     </div>
     <div id="msg"></div>
-    <div class="viewport"><div class="photos" id="photos"></div></div>
-    <div class="pager">
-      <button id="prev" disabled>◀ 이전 10개</button>
-      <span id="info">검색어를 입력해 주세요</span>
-      <button id="next" disabled>다음 10개 ▶</button>
-    </div>
+    <div class="stage" id="stage"><img id="photo" alt=""></div>
+    <div id="info">검색어를 입력하면 이미지가 1.5초마다 한 장씩 바뀌어요</div>
     <p class="credit">이미지 출처: <a href="https://pixabay.com" target="_blank" rel="noopener">Pixabay</a></p>
   </div>
 
@@ -190,63 +182,62 @@
 </div>
 
 <script>
-  const PER_PAGE = 10;
-  const MAX_HITS = 500; // Pixabay API 한도
+  const INTERVAL = 1500; // 1.5초마다 다음 이미지
   const $ = id => document.getElementById(id);
-  let state = { q: '', page: 1, total: 0 };
+  let timer = null;
 
-  async function load(page, direction) {
+  async function load() {
     const q = $('q').value.trim();
     if (!q) { $('msg').textContent = '검색어를 입력해 주세요.'; return; }
     $('msg').textContent = '';
-    ['prev', 'next', 'search'].forEach(i => $(i).disabled = true);
+    stop();
+    $('search').disabled = true;
     try {
       // API Key는 서버(/api/pixabay)가 환경변수로 가지고 있어서 브라우저에는 없다.
-      const res = await fetch('/api/pixabay?' + new URLSearchParams({ q, page }));
+      const res = await fetch('/api/pixabay?' + new URLSearchParams({ q, page: 1 }));
       if (!res.ok) {
         const detail = (await res.text()).slice(0, 150);
         throw new Error(res.status === 429 ? '요청이 너무 많아요. 잠시 후 다시 시도해 주세요.'
           : '오류가 발생했어요 (' + res.status + ') ' + detail);
       }
       const data = await res.json();
-      state = { q, page, total: Math.min(data.totalHits, MAX_HITS) };
-      render(data.hits, direction);
+      if (!data.hits.length) { $('msg').textContent = '검색 결과가 없어요.'; return; }
+      play(data.hits);
     } catch (e) {
       $('msg').textContent = e.message;
     } finally {
       $('search').disabled = false;
-      updateNav();
     }
   }
 
-  function render(hits, direction) {
-    const el = $('photos');
-    el.className = 'photos';
-    el.innerHTML = '';
-    if (!hits.length) { $('msg').textContent = '검색 결과가 없어요.'; return; }
-    hits.forEach(h => {
-      const a = document.createElement('a');
-      a.href = h.pageURL; a.target = '_blank'; a.rel = 'noopener';
-      const img = document.createElement('img');
-      img.src = h.webformatURL; img.alt = h.tags; img.title = h.tags; img.loading = 'lazy';
-      a.appendChild(img);
-      el.appendChild(a);
-    });
-    void el.offsetWidth; // 애니메이션 재시작
-    el.classList.add(direction === 'prev' ? 'slide-prev' : 'slide-next');
+  function stop() {
+    clearInterval(timer);
+    timer = null;
+    $('stage').classList.remove('on');
+    $('info').textContent = '';
   }
 
-  function updateNav() {
-    const lastPage = Math.max(1, Math.ceil(state.total / PER_PAGE));
-    $('prev').disabled = state.page <= 1;
-    $('next').disabled = state.page >= lastPage || !state.total;
-    if (state.total) $('info').textContent = state.page + ' / ' + lastPage + ' 페이지 (총 ' + state.total + '장)';
+  // 이미지를 한 장씩 보여주고, 끝까지 가면 처음부터 반복
+  function play(hits) {
+    let i = 0;
+    const show = () => {
+      const h = hits[i];
+      const img = $('photo');
+      img.style.animation = 'none';
+      void img.offsetWidth; // 페이드 애니메이션 재시작
+      img.style.animation = '';
+      img.src = h.webformatURL;
+      img.alt = h.tags;
+      $('info').textContent = (i + 1) + ' / ' + hits.length + ' · ' + h.tags;
+      i = (i + 1) % hits.length;
+    };
+    $('stage').classList.add('on');
+    show();
+    timer = setInterval(show, INTERVAL);
   }
 
-  $('search').onclick = () => load(1, 'next');
-  $('q').addEventListener('keydown', e => { if (e.key === 'Enter') load(1, 'next'); });
-  $('prev').onclick = () => load(state.page - 1, 'prev');
-  $('next').onclick = () => load(state.page + 1, 'next');
+  $('search').onclick = load;
+  $('q').addEventListener('keydown', e => { if (e.key === 'Enter') load(); });
 </script>
 </body>
 </html>
