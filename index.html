@@ -101,8 +101,9 @@
   #msg { min-height: 1.5em; color: #c0392b; margin-bottom: 6px; }
   .stage { position: relative; height: 380px; background: #26323a; border-radius: 10px; overflow: hidden; display: none; }
   .stage.on { display: block; }
-  .stage img { width: 100%; height: 100%; object-fit: contain; display: block; animation: fadeIn .4s ease; }
-  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  /* 이미지 두 장을 겹쳐 놓고 투명도만 바꿔서 자연스럽게 교차(크로스페이드) */
+  .stage img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; opacity: 0; transition: opacity .5s ease; }
+  .stage img.show { opacity: 1; }
   #info { margin-top: 8px; text-align: center; font-size: .9rem; color: #556; min-height: 1.4em; }
   .credit { margin: 12px 0 0; font-size: .85rem; color: #667; text-align: center; }
   .credit a { color: #1b8fa6; }
@@ -182,7 +183,7 @@
       <button id="search">검색</button>
     </div>
     <div id="msg"></div>
-    <div class="stage" id="stage"><img id="photo" alt=""></div>
+    <div class="stage" id="stage"><img id="photoA" alt=""><img id="photoB" alt=""></div>
     <div id="info">검색어를 입력하면 이미지가 1.5초마다 한 장씩 바뀌어요</div>
     <p class="credit">이미지 출처: <a href="https://pixabay.com" target="_blank" rel="noopener">Pixabay</a></p>
   </div>
@@ -246,21 +247,28 @@
 
   // 이미지를 한 장씩 보여주고, 끝까지 가면 처음부터 반복
   function play(hits) {
-    let i = 0;
+    hits.forEach(h => { new Image().src = h.webformatURL; }); // 미리 받아 두면 바뀔 때 비어 보이지 않음
+    const imgs = [$('photoA'), $('photoB')];
+    imgs.forEach(img => img.classList.remove('show'));
+    let i = 0, front = 1;
     const show = () => {
       const h = hits[i];
-      const img = $('photo');
-      img.style.animation = 'none';
-      void img.offsetWidth; // 페이드 애니메이션 재시작
-      img.style.animation = '';
-      img.src = h.webformatURL;
-      img.alt = h.tags;
+      const next = imgs[front ^ 1];
+      const cur = imgs[front];
+      // 새 이미지가 다 로드된 뒤에 교체해서 깜빡임을 막는다
+      next.onload = () => {
+        next.classList.add('show');
+        cur.classList.remove('show');
+        front ^= 1;
+      };
+      next.src = h.webformatURL;
+      next.alt = h.tags;
       $('info').textContent = (i + 1) + ' / ' + hits.length + ' · ' + h.tags;
       i = (i + 1) % hits.length;
     };
     $('stage').classList.add('on');
     show();
-    timer = setInterval(show, INTERVAL);
+    if (hits.length > 1) timer = setInterval(show, INTERVAL);
   }
 
   $('search').onclick = load;
