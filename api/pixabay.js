@@ -2,7 +2,10 @@
 module.exports = async (req, res) => {
   const key = process.env.PIXABAY_KEY;
   if (!key) {
-    res.status(500).send('서버에 PIXABAY_KEY 환경변수가 설정되지 않았어요.');
+    // 진단용: 값은 보여주지 않고 이름만 알려준다 (원인 확인 후 지워도 됨)
+    const similar = Object.keys(process.env).filter(k => /pixabay|api|key/i.test(k));
+    res.status(500).send('서버에 PIXABAY_KEY 환경변수가 설정되지 않았어요. (VERCEL_ENV=' + process.env.VERCEL_ENV
+      + ', 비슷한 이름: ' + (similar.join(', ') || '없음') + ')');
     return;
   }
 
