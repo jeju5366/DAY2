@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>제주 명소 정보</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: sans-serif;
+    background: #eef6f5;
+    color: #26323a;
+    line-height: 1.6;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 16px; }
+
+  header {
+    background: linear-gradient(135deg, #1b8fa6, #f58a3b);
+    color: #fff;
+    text-align: center;
+    padding: 28px 16px;
+    border-radius: 12px;
+  }
+  header h1 { margin: 0; font-size: clamp(1.4rem, 5vw, 2rem); }
+  header p { margin: 6px 0 0; opacity: .95; }
+
+  /* ── 카테고리 메뉴 (PC: 글자 탭) ── */
+  .cats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin: 14px 0;
+  }
+  .cat {
+    border: 0;
+    border-radius: 12px;
+    background: #fff;
+    color: #26323a;
+    padding: 12px 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .cat .icon { font-size: 1.2rem; }
+  .cat:hover { background: #ffe9d6; }
+  .cat[aria-selected="true"] { background: #1b8fa6; color: #fff; font-weight: bold; }
+
+  /* ── 내용 카드 ── */
+  .panel {
+    background: #fff;
+    border-radius: 12px;
+    padding: 22px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.06);
+    min-height: 260px;
+  }
+  .panel h2 { margin: 0 0 12px; font-size: 1.3rem; color: #1b8fa6; }
+  .panel .big-icon { font-size: 2.4rem; display: block; margin-bottom: 6px; }
+  .rows { margin: 0; padding: 0; list-style: none; }
+  .rows li { padding: 10px 0; border-bottom: 1px solid #eef1f2; display: flex; justify-content: space-between; gap: 12px; }
+  .rows li:last-child { border-bottom: 0; }
+  .rows b { color: #26323a; }
+  .rows span { color: #4b5b66; text-align: right; }
+  .review { background: #f4fbfa; border-radius: 10px; padding: 12px; margin-bottom: 10px; }
+  .review .stars { color: #f5a623; letter-spacing: 2px; }
+  .note { margin-top: 14px; font-size: .85rem; color: #7a8892; }
+
+  /* ── 모바일: 하단 아이콘 메뉴 ── */
+  @media (max-width: 700px) {
+    .wrap { padding: 10px 10px 90px; }
+    header { padding: 20px 12px; }
+    .panel { padding: 16px; }
+
+    .cats {
+      position: fixed;
+      left: 0; right: 0; bottom: 0;
+      z-index: 5;
+      margin: 0;
+      gap: 0;
+      padding: 6px 6px calc(6px + env(safe-area-inset-bottom));
+      background: #fff;
+      border-top: 1px solid #dde;
+      box-shadow: 0 -4px 12px rgba(0,0,0,.08);
+    }
+    .cat {
+      flex-direction: column;
+      gap: 2px;
+      padding: 8px 0;
+      font-size: .7rem;      /* 글자는 작게, 아이콘을 크게 */
+      background: transparent;
+      box-shadow: none;
+      border-radius: 10px;
+    }
+    .cat .icon { font-size: 1.7rem; line-height: 1.1; }
+    .cat[aria-selected="true"] { background: #e3f4f7; color: #1b8fa6; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>🌅 성산일출봉</h1>
+    <p>제주 명소 정보 · 위치 / 운영시간 / 가격 / 리뷰</p>
+  </header>
+
+  <div class="cats" role="tablist" id="cats"></div>
+  <main class="panel" id="panel" role="tabpanel" aria-live="polite"></main>
+
+</div>
+
+<script>
+  // 항목 4개: 카테고리 (위치, 운영시간, 가격, 리뷰)
+  // ※ 아래 내용은 화면을 보여주기 위한 예시 데이터예요. 실제 정보는 공식 안내로 확인해 주세요.
+  const CATS = [
+    {
+      key: 'location', label: '위치', icon: '📍',
+      render: () => `
+        <span class="big-icon">📍</span>
+        <h2>위치</h2>
+        <ul class="rows">
+          <li><b>지역</b><span>제주 서귀포시 성산읍</span></li>
+          <li><b>특징</b><span>바다 위로 솟은 분화구</span></li>
+          <li><b>가는 방법</b><span>렌터카 또는 버스 (예시)</span></li>
+          <li><b>주차</b><span>주차장 이용 가능 (예시)</span></li>
+        </ul>`
+    },
+    {
+      key: 'hours', label: '운영시간', icon: '⏰',
+      render: () => `
+        <span class="big-icon">⏰</span>
+        <h2>운영시간</h2>
+        <ul class="rows">
+          <li><b>개방</b><span>계절에 따라 달라요 (예시)</span></li>
+          <li><b>일출 감상</b><span>이른 아침 방문 추천</span></li>
+          <li><b>휴무</b><span>기상 상황에 따라 변동 (예시)</span></li>
+        </ul>`
+    },
+    {
+      key: 'price', label: '가격', icon: '🎫',
+      render: () => `
+        <span class="big-icon">🎫</span>
+        <h2>가격</h2>
+        <ul class="rows">
+          <li><b>성인</b><span>○○○○원 (예시)</span></li>
+          <li><b>청소년</b><span>○○○○원 (예시)</span></li>
+          <li><b>어린이</b><span>○○○○원 (예시)</span></li>
+        </ul>`
+    },
+    {
+      key: 'review', label: '리뷰', icon: '⭐',
+      render: () => `
+        <span class="big-icon">⭐</span>
+        <h2>리뷰</h2>
+        <div class="review"><div class="stars">★★★★★</div>일출 보러 새벽에 올라갔는데 풍경이 최고였어요! (예시)</div>
+        <div class="review"><div class="stars">★★★★☆</div>계단이 조금 힘들지만 올라가면 보람 있어요. (예시)</div>
+        <div class="review"><div class="stars">★★★★☆</div>해 질 무렵에도 분위기가 좋아요. (예시)</div>`
+    }
+  ];
+
+  const catsEl = document.getElementById('cats');
+  const panelEl = document.getElementById('panel');
+  let active = 'location';
+
+  function draw() {
+    // 메뉴 버튼 그리기 (화면이 좁으면 CSS가 아이콘 중심으로 바꿔줌)
+    catsEl.innerHTML = '';
+    CATS.forEach(c => {
+      const b = document.createElement('button');
+      b.className = 'cat';
+      b.setAttribute('role', 'tab');
+      b.setAttribute('aria-selected', c.key === active);
+      b.setAttribute('aria-label', c.label);
+      b.innerHTML = '<span class="icon">' + c.icon + '</span><span class="text">' + c.label + '</span>';
+      b.onclick = () => { active = c.key; draw(); };
+      catsEl.appendChild(b);
+    });
+    // 선택한 카테고리 내용 보여주기
+    const cur = CATS.find(c => c.key === active);
+    panelEl.innerHTML = cur.render() + '<p class="note">※ 예시 내용이에요. 정확한 정보는 방문 전에 공식 안내로 확인해 주세요.</p>';
+  }
+
+  draw();
+</script>
+</body>
+</html>
