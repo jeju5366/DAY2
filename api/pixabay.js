@@ -1,5 +1,5 @@
 // Vercel 서버리스 함수: 환경변수 PIXABAY_KEY 로 Pixabay API 를 대신 호출한다.
-export default async function handler(req, res) {
+module.exports = async (req, res) => {
   const key = process.env.PIXABAY_KEY;
   if (!key) {
     res.status(500).send('서버에 PIXABAY_KEY 환경변수가 설정되지 않았어요.');
@@ -19,10 +19,20 @@ export default async function handler(req, res) {
     safesearch: 'true'
   });
 
-  const upstream = await fetch(url);
-  const body = await upstream.text();
+  try {
+    const upstream = await fetch(url);
+    const body = await upstream.text();
 
-  // Pixabay 규칙: 결과를 24시간 캐시
-  res.setHeader('Cache-Control', 's-maxage=86400, stale-while-revalidate');
-  res.status(upstream.status).send(body);
-}
+    if (!upstream.ok) {
+      res.status(upstream.status).send('Pixabay 오류: ' + body);
+      return;
+    }
+
+    // Pixabay 규칙: 결과를 24시간 캐시
+    res.setHeader('Cache-Control', 's-maxage=86400, stale-while-revalidate');
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.status(200).send(body);
+  } catch (e) {
+    res.status(502).send('Pixabay 호출 실패: ' + e.message);
+  }
+};

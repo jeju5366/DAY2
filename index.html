@@ -63,8 +63,11 @@
     try {
       // API Key는 서버(/api/pixabay)가 환경변수로 가지고 있어서 브라우저에는 없다.
       const res = await fetch('/api/pixabay?' + new URLSearchParams({ q, page }));
-      if (!res.ok) throw new Error(res.status === 429 ? '요청이 너무 많아요. 잠시 후 다시 시도해 주세요.'
-        : '오류가 발생했어요 (' + res.status + ')');
+      if (!res.ok) {
+        const detail = (await res.text()).slice(0, 150);
+        throw new Error(res.status === 429 ? '요청이 너무 많아요. 잠시 후 다시 시도해 주세요.'
+          : '오류가 발생했어요 (' + res.status + ') ' + detail);
+      }
       const data = await res.json();
       state = { q, page, total: Math.min(data.totalHits, MAX_HITS) };
       render(data.hits, direction);
