@@ -117,12 +117,45 @@
     font-size: .9rem;
   }
 
+  /* 화면 크기에 따라 글자·이미지 영역이 자연스럽게 변하도록 */
+  header h1 { font-size: clamp(1.4rem, 5vw, 2rem); }
+  .stage { height: auto; aspect-ratio: 16 / 9; max-height: 480px; }
+  img, iframe { max-width: 100%; }
+
+  /* 태블릿: 오른쪽 팁 칸을 조금 좁게 */
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 3fr 2fr; padding: 12px; }
+  }
+
+  /* 모바일: 한 줄로 쌓기 */
   @media (max-width: 700px) {
     .layout {
       grid-template-columns: 1fr;
       grid-template-areas: "header" "nav" "section" "article" "aside" "gallery" "footer";
+      gap: 10px;
+      padding: 10px 10px 80px;
     }
-    .stage { height: 260px; }
+    header { padding: 22px 12px; }
+    section, article, aside, .gallery { padding: 16px; }
+    /* 메뉴는 한 줄로 가로 스크롤, 터치하기 편하게 크게 */
+    nav { flex-wrap: nowrap; justify-content: flex-start; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    nav a { white-space: nowrap; padding: 10px 16px; }
+    .spots { grid-template-columns: 1fr 1fr; }
+    .search-form { flex-direction: column; }
+    #q, .gallery button { width: 100%; padding: 12px; font-size: 1rem; }
+    .stage { aspect-ratio: 4 / 3; }
+    /* 채팅창은 화면 아래에 가득 차게 */
+    .chat-fab { right: 12px; bottom: 12px; padding: 14px 20px; }
+    /* 버튼(닫기)이 가려지지 않도록 버튼 위쪽에 가득 차게 */
+    .chat-panel {
+      right: 8px; left: 8px; bottom: 68px; width: auto; max-width: none;
+      height: 70vh; height: 70dvh; max-height: none;
+    }
+  }
+
+  /* 아주 작은 화면 */
+  @media (max-width: 420px) {
+    .spots { grid-template-columns: 1fr; }
   }
 </style>
 </head>

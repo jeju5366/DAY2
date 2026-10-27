@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>제주 Y2K 투어</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&family=Pacifico&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Noto Sans KR", sans-serif;
+    color: #12304a;
+    line-height: 1.6;
+    min-height: 100vh;
+    /* 2000년대 여행 사이트 느낌: 하늘 → 바다 → 모래 그라데이션 */
+    background:
+      radial-gradient(circle at 15% 8%, rgba(255,255,255,.9) 0 3%, transparent 3.5%),
+      radial-gradient(circle at 82% 14%, rgba(255,255,255,.8) 0 2%, transparent 2.5%),
+      linear-gradient(180deg, #7fd3ff 0%, #b8ecff 28%, #5fd0d8 55%, #ffe9b0 100%);
+    background-attachment: fixed;
+  }
+  .layout {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 18px 16px 90px;
+    display: grid;
+    gap: 16px;
+    grid-template-columns: 2fr 1fr;
+    grid-template-areas:
+      "header  header"
+      "nav     nav"
+      "section aside"
+      "article aside"
+      "gallery gallery"
+      "footer  footer";
+  }
+  header  { grid-area: header; }
+  nav     { grid-area: nav; }
+  section { grid-area: section; }
+  article { grid-area: article; }
+  aside   { grid-area: aside; }
+  footer  { grid-area: footer; }
+  .gallery { grid-area: gallery; }
+
+  /* 헤더: 광택 있는 티켓 패널 */
+  header {
+    text-align: center;
+    padding: 30px 16px 26px;
+    border-radius: 14px;
+    background: linear-gradient(180deg, #ffffff 0%, #e6f6ff 100%);
+    border: 3px solid #fff;
+    box-shadow: 0 6px 0 #4aa9d8, 0 12px 24px rgba(0,60,100,.25);
+    position: relative;
+    overflow: hidden;
+  }
+  header::before, header::after {
+    content: "✦";
+    position: absolute;
+    color: #ffb400;
+    font-size: 2rem;
+    text-shadow: 0 0 8px #fff;
+  }
+  header::before { left: 4%; top: 14%; }
+  header::after  { right: 5%; bottom: 14%; font-size: 1.5rem; color: #ff5fa8; }
+  header .eyebrow {
+    display: inline-block;
+    font-size: .8rem;
+    font-weight: 900;
+    letter-spacing: .12em;
+    color: #fff;
+    background: linear-gradient(180deg, #7ee06a, #2aa63a);
+    border: 2px solid #fff;
+    border-radius: 20px;
+    padding: 2px 14px;
+    box-shadow: 0 2px 4px rgba(0,0,0,.25);
+  }
+  header h1 {
+    margin: 10px 0 0;
+    font-family: "Pacifico", cursive;
+    font-size: 2.8rem;
+    font-weight: 400;
+    color: #0b3b78;
+    text-shadow: 2px 2px 0 #fff, 4px 4px 0 #8fd3ff;
+    -webkit-box-reflect: below -6px linear-gradient(transparent 55%, rgba(255,255,255,.55));
+  }
+  header p { margin: 18px 0 0; color: #1b5a86; font-weight: 700; }
+
+  /* 네비게이션: 반짝이는 알약 버튼 */
+  nav {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px;
+    border-radius: 14px;
+    background: rgba(255,255,255,.55);
+    border: 2px solid #fff;
+  }
+  nav a {
+    text-decoration: none;
+    color: #fff;
+    font-weight: 900;
+    padding: 7px 18px;
+    border-radius: 22px;
+    background: linear-gradient(180deg, #5cc9ff 0%, #1b86d6 100%);
+    border: 2px solid #fff;
+    box-shadow: 0 3px 0 #0e5fa3, 0 4px 8px rgba(0,0,0,.2);
+    text-shadow: 0 1px 2px rgba(0,0,0,.35);
+  }
+  nav a:hover { background: linear-gradient(180deg, #ffc15a 0%, #ff8a00 100%); box-shadow: 0 3px 0 #b85f00, 0 4px 8px rgba(0,0,0,.2); }
+
+  /* 카드: 흰색 → 연하늘 그라데이션 패널 */
+  section, article, aside, .gallery {
+    background: linear-gradient(180deg, #ffffff 0%, #eaf7ff 100%);
+    border: 3px solid #fff;
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 5px 0 #7bbfe6, 0 10px 20px rgba(0,60,100,.18);
+  }
+  h2 {
+    margin: 0 0 10px;
+    font-size: 1.3rem;
+    font-weight: 900;
+    color: #0b5ea8;
+    text-shadow: 1px 1px 0 #fff;
+  }
+  h2::after { content: " ✦"; color: #ffb400; }
+  h3 { margin: 14px 0 4px; font-size: 1.05rem; color: #e0409a; }
+  p { margin: 0 0 8px; }
+
+  .spots { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-top: 12px; }
+  .spot {
+    background: linear-gradient(180deg, #fff8dc, #ffe9a8);
+    border: 2px solid #fff;
+    border-radius: 12px;
+    padding: 12px;
+    box-shadow: 0 3px 0 #e8c25a;
+  }
+  .spot b { display: block; margin-bottom: 4px; color: #b25b00; }
+
+  aside ul { margin: 0; padding-left: 20px; }
+  aside li { margin-bottom: 6px; }
+  .tip {
+    margin-top: 12px;
+    padding: 10px;
+    font-size: .9rem;
+    border-radius: 10px;
+    background: linear-gradient(180deg, #ffd6ec, #ffb3da);
+    border: 2px dashed #fff;
+    color: #8a1f5c;
+    font-weight: 700;
+  }
+
+  /* 광택 버튼 (주황) */
+  .gloss-btn, .gallery button {
+    padding: 8px 20px;
+    font-size: 1rem;
+    font-weight: 900;
+    color: #fff;
+    border: 2px solid #fff;
+    border-radius: 22px;
+    background: linear-gradient(180deg, #ffc15a 0%, #ff8a00 100%);
+    box-shadow: 0 3px 0 #b85f00, 0 4px 8px rgba(0,0,0,.25);
+    text-shadow: 0 1px 2px rgba(0,0,0,.35);
+    cursor: pointer;
+  }
+  .gallery button:disabled { background: #b9c6d0; box-shadow: 0 3px 0 #8896a1; cursor: default; }
+
+  .search-form { display: flex; gap: 10px; margin-bottom: 10px; }
+  #q {
+    flex: 1;
+    padding: 9px 12px;
+    font-size: 1rem;
+    border: 2px solid #9fd4f2;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: inset 0 2px 4px rgba(0,60,100,.15);
+  }
+  #msg { min-height: 1.5em; color: #d6245a; font-weight: 700; margin-bottom: 6px; }
+  .stage { position: relative; height: 380px; background: #0b3b78; border: 3px solid #fff; border-radius: 12px; overflow: hidden; display: none; box-shadow: 0 4px 0 #4aa9d8; }
+  .stage.on { display: block; }
+  .stage img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; opacity: 0; transition: opacity .5s ease; }
+  .stage img.show { opacity: 1; }
+  #info { margin-top: 8px; text-align: center; font-size: .9rem; color: #3b6c8c; min-height: 1.4em; }
+  .credit { margin: 12px 0 0; font-size: .85rem; color: #3b6c8c; text-align: center; }
+  .credit a { color: #0b5ea8; }
+
+  footer {
+    text-align: center;
+    padding: 16px;
+    border-radius: 14px;
+    font-size: .9rem;
+    font-weight: 700;
+    color: #fff;
+    background: linear-gradient(180deg, #4db8ff 0%, #0e69c2 100%);
+    border: 3px solid #fff;
+    box-shadow: 0 5px 0 #0a4b8c, 0 10px 20px rgba(0,60,100,.25);
+    text-shadow: 0 1px 2px rgba(0,0,0,.35);
+  }
+  footer p { margin: 2px 0; }
+
+  .chat-fab {
+    position: fixed; right: 20px; bottom: 20px; z-index: 10;
+  }
+  .chat-panel {
+    position: fixed; right: 20px; bottom: 76px; z-index: 10;
+    width: 380px; height: 520px; max-width: calc(100vw - 40px); max-height: calc(100vh - 100px);
+    border: 3px solid #fff; border-radius: 14px; box-shadow: 0 6px 24px rgba(0,0,0,.35); background: #fff;
+    display: none;
+  }
+  .chat-panel.open { display: block; }
+
+  @media (max-width: 700px) {
+    .layout {
+      grid-template-columns: 1fr;
+      grid-template-areas: "header" "nav" "section" "article" "aside" "gallery" "footer";
+    }
+    header h1 { font-size: 2.1rem; }
+    .stage { height: 260px; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <header>
+    <span class="eyebrow">JEJU Y2K TOUR</span>
+    <h1>Jeju Tour</h1>
+    <p>🌴 반짝이는 바다와 오름, 제주로 떠나는 여행 🍊</p>
+  </header>
+
+  <nav>
+    <a href="#highlights">🌟 대표 명소</a>
+    <a href="#course">🗺️ 추천 코스</a>
+    <a href="#tips">💡 여행 팁</a>
+    <a href="#gallery">🖼️ 이미지 검색</a>
+    <a href="#contact">📞 안내</a>
+  </nav>
+
+  <section id="highlights">
+    <h2>🌟 제주 대표 명소</h2>
+    <p>제주는 화산섬이 만든 독특한 풍경과 푸른 바다를 함께 즐길 수 있는 곳이에요.</p>
+    <div class="spots">
+      <div class="spot"><b>🌅 성산일출봉</b>바다 위로 솟은 분화구, 일출 명소로 유명해요.</div>
+      <div class="spot"><b>⛰️ 한라산</b>남한 최고봉, 계절마다 다른 모습의 등산 코스가 있어요.</div>
+      <div class="spot"><b>🏖️ 협재해변</b>에메랄드빛 바다와 하얀 모래가 매력적이에요.</div>
+      <div class="spot"><b>🏝️ 우도</b>배를 타고 들어가는 작은 섬, 자전거 여행에 좋아요.</div>
+      <div class="spot"><b>💧 천지연폭포</b>도심 가까이에서 만나는 시원한 폭포예요.</div>
+      <div class="spot"><b>🕳️ 만장굴</b>세계적으로 알려진 용암동굴이에요.</div>
+    </div>
+  </section>
+
+  <article id="course">
+    <h2>🗺️ 1박 2일 추천 코스</h2>
+    <h3>☀️ 1일차 · 동쪽 코스</h3>
+    <p>성산일출봉 → 섭지코지 → 우도 → 해안도로 드라이브</p>
+    <h3>🌙 2일차 · 서쪽 코스</h3>
+    <p>협재해변 → 한림 카페거리 → 오름 산책 → 노을 감상</p>
+    <p>☕ 코스 중간중간 분위기 좋은 카페에서 쉬어가는 것도 잊지 마세요!</p>
+  </article>
+
+  <aside id="tips">
+    <h2>💡 여행 팁</h2>
+    <ul>
+      <li>🚗 대중교통보다 렌터카가 편해요</li>
+      <li>🌦️ 날씨 변화가 잦으니 겉옷을 챙겨요</li>
+      <li>🍽️ 흑돼지, 해산물, 감귤 디저트를 꼭 맛보세요</li>
+      <li>📅 성수기엔 숙소와 항공권을 미리 예약해요</li>
+      <li>🌱 오름과 해변에서는 쓰레기를 되가져가요</li>
+    </ul>
+    <div class="tip">📌 영업시간과 입장료는 방문 전에 공식 안내로 확인해 주세요.</div>
+  </aside>
+
+  <div class="gallery" id="gallery">
+    <h2>🖼️ 제주 이미지 검색</h2>
+    <div class="search-form">
+      <input id="q" type="text" placeholder="검색어를 입력하세요 (예: 제주 바다)">
+      <button id="search">검색 »</button>
+    </div>
+    <div id="msg"></div>
+    <div class="stage" id="stage"><img id="photoA" alt=""><img id="photoB" alt=""></div>
+    <div id="info">검색어를 입력하면 이미지가 1.5초마다 한 장씩 바뀌어요</div>
+    <p class="credit">이미지 출처: <a href="https://pixabay.com" target="_blank" rel="noopener">Pixabay</a></p>
+  </div>
+
+  <footer id="contact">
+    <p>🍊 제주 여행 안내 · 즐거운 제주 여행 되세요 🌊</p>
+    <p>정확한 관광 정보는 제주관광 공식 안내를 참고해 주세요.</p>
+  </footer>
+
+</div>
+
+<button class="gloss-btn chat-fab" id="chatBtn">💬 카페 에이전트</button>
+<iframe class="chat-panel" id="chatPanel" title="제주 카페 에이전트"></iframe>
+
+<script>
+  // 버튼을 누르면 agent.html 을 채팅창으로 열고, 다시 누르면 닫는다
+  const chatBtn = document.getElementById('chatBtn');
+  const chatPanel = document.getElementById('chatPanel');
+  chatBtn.addEventListener('click', () => {
+    if (!chatPanel.getAttribute('src')) chatPanel.src = 'agent.html'; // 처음 열 때만 불러옴
+    const open = chatPanel.classList.toggle('open');
+    chatBtn.textContent = open ? '✕ 닫기' : '💬 카페 에이전트';
+  });
+</script>
+
+<script>
+  const INTERVAL = 1500; // 1.5초마다 다음 이미지
+  const $ = id => document.getElementById(id);
+  let timer = null;
+
+  async function load() {
+    const q = $('q').value.trim();
+    if (!q) { $('msg').textContent = '검색어를 입력해 주세요.'; return; }
+    $('msg').textContent = '';
+    stop();
+    $('search').disabled = true;
+    try {
+      // API Key는 서버(/api/pixabay)가 환경변수로 가지고 있어서 브라우저에는 없다.
+      const res = await fetch('/api/pixabay?' + new URLSearchParams({ q, page: 1 }));
+      if (!res.ok) {
+        const detail = (await res.text()).slice(0, 150);
+        throw new Error(res.status === 429 ? '요청이 너무 많아요. 잠시 후 다시 시도해 주세요.'
+          : '오류가 발생했어요 (' + res.status + ') ' + detail);
+      }
+      const data = await res.json();
+      if (!data.hits.length) { $('msg').textContent = '검색 결과가 없어요.'; return; }
+      play(data.hits);
+    } catch (e) {
+      $('msg').textContent = e.message;
+    } finally {
+      $('search').disabled = false;
+    }
+  }
+
+  function stop() {
+    clearInterval(timer);
+    timer = null;
+    $('stage').classList.remove('on');
+    $('info').textContent = '';
+  }
+
+  // 이미지를 한 장씩 보여주고, 끝까지 가면 처음부터 반복
+  function play(hits) {
+    hits.forEach(h => { new Image().src = h.webformatURL; }); // 미리 받아 두면 바뀔 때 비어 보이지 않음
+    const imgs = [$('photoA'), $('photoB')];
+    imgs.forEach(img => img.classList.remove('show'));
+    let i = 0, front = 1;
+    const show = () => {
+      const h = hits[i];
+      const next = imgs[front ^ 1];
+      const cur = imgs[front];
+      // 새 이미지가 다 로드된 뒤에 교체해서 깜빡임을 막는다
+      next.onload = () => {
+        next.classList.add('show');
+        cur.classList.remove('show');
+        front ^= 1;
+      };
+      next.src = h.webformatURL;
+      next.alt = h.tags;
+      $('info').textContent = (i + 1) + ' / ' + hits.length + ' · ' + h.tags;
+      i = (i + 1) % hits.length;
+    };
+    $('stage').classList.add('on');
+    show();
+    if (hits.length > 1) timer = setInterval(show, INTERVAL);
+  }
+
+  $('search').onclick = load;
+  $('q').addEventListener('keydown', e => { if (e.key === 'Enter') load(); });
+</script>
+</body>
+</html>
